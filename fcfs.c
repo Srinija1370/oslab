@@ -1,107 +1,52 @@
 #include<stdio.h>
-void sort(int p[],int at[],int bt[],int n)
-{
-	for(int i=0;i<n-1;i++)
-	{
-		for(int j=0;j<n-1-i;j++)
-		{
-			if(at[j]>at[j+1])
-			{
-				int temp1=at[j];
-				at[j]=at[j+1];
-				at[j+1]=temp1;
-				
-				int temp2=bt[j];
-				bt[j]=bt[j+1];
-				bt[j+1]=temp2;
-				
-				int temp3=p[j];
-				p[j]=p[j+1];
-				p[j+1]=temp3;
+struct point{
+	int a;
+	int b;
+};
+struct point sort(struct point p[],int n){
+	for(int i=0;i<n;i++){
+		for(int j=i+1;j<n;j++){
+			if(p[i].a>p[j].a){
+				struct point t=p[i];
+				p[i]=p[j];
+				p[j]=t;
 			}
 		}
 	}
 }
-int completionTime(int at[],int bt[],int ct[],int n)
-{
-	ct[0]=at[0]+bt[0];
-	for(int i=1;i<n;i++)
-	{
-		if(at[i]<=ct[i-1])
-		{
-			ct[i]=ct[i-1]+bt[i];
-		}
-		else
-		{
-			ct[i]=at[i]+bt[i];
-		}
-	}
-}
-void turnAroundTime(int tat[],int at[],int ct[],int n)
-{
-	for(int i=0;i<n;i++)
-	{
-		tat[i]=ct[i]-at[i];
-	}
-}
-void waitingTime(int wt[],int tat[],int bt[],int n)
-{
-	for(int i=0;i<n;i++)
-	{
-		wt[i]=tat[i]-bt[i];
-	}
-}
-float avgtat(int tat[],int n)
-{
-	float sum=0;
-	for(int i=0;i<n;i++)
-		sum=sum+tat[i];
-	float avg=sum/n;
-	return avg;
-}
-float avgwt(int wt[],int n)
-{
-	float sum=0;
-	for(int i=0;i<n;i++)
-		sum=sum+wt[i];
-	float avg=sum/n;
-	return avg;
-}
-int main()
-{
+int max(int a,int b){
+	if(a>b)
+		return a;
+	else
+		return b;
+}	
+int main(){
+	struct point p[100];
 	int n;
-	printf("enter number of processors: ");
+	printf("enter the number of processes:");
 	scanf("%d",&n);
-	int at[n],bt[n],ct[n],tat[n],wt[n],p[n];
-	printf("enter processors: ");
-	for(int i=0;i<n;i++)
-	{
-		scanf("%d",&p[i]);
+	for(int i=0;i<n;i++){
+		scanf("%d%d",&p[i].a,&p[i].b);
 	}
-	printf("enter arrival times: ");
+	sort(p,n);
+	printf("the processes after sorting are....\n");
 	for(int i=0;i<n;i++)
-	{
-		scanf("%d",&at[i]);
+		printf("%d %d\n",p[i].a,p[i].b);
+	int ct[100],wt[100],tat[100],awt=0,atat=0;
+	ct[0]=p[0].a+p[0].b;
+	for(int i=1;i<n;i++){
+		ct[i]=max(ct[i-1],p[i].a)+p[i].b;
 	}
-	printf("enter burst times: ");
-	for(int i=0;i<n;i++)
-	{
-		scanf("%d",&bt[i]);
+	for(int i=0;i<n;i++){
+		tat[i]=ct[i]-p[i].a;
+		wt[i]=tat[i]-p[i].b;
+		atat+=tat[i];
+		awt+=wt[i];
 	}
-	sort(p,at,bt,n);	
-	printf("Gantt Chat processors order: ");
+	printf("AT\t BT\t CT\t WT\t TAT\n");
 	for(int i=0;i<n;i++)
-	{
-		printf("%d ",p[i]);
-	}
-	completionTime(at,bt,ct,n);
-	turnAroundTime(tat,at,ct,n);
-	waitingTime(wt,tat,bt,n);
-	float avgtatTime=avgtat(tat,n);
-	float avgwtTime=avgwt(wt,n);
-	printf("\nP\tAT\tBT\tCT\tTAT\tWT\n");
-	for(int i=0;i<n;i++)
-		printf("%d\t%d\t%d\t%d\t%d\t%d\n",p[i],at[i],bt[i],ct[i],tat[i],wt[i]);
-	printf("\nAverage Turn around time: %f",avgtatTime);
-	printf("\nAverage waiting time: %f",avgwtTime);
+		printf("%d\t %d\t %d\t %d\t %d\n",p[i].a,p[i].b,ct[i],wt[i],tat[i]);
+	printf("the average waiting time is %f",(float)awt/n);
+	printf("\nthe average turn around time is %f",(float)atat/n);
+		
 }
